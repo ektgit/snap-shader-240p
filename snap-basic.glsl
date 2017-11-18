@@ -103,21 +103,14 @@ void main()
 {
     output_dummy _OUT;
 
-    vec2 coordA = TEX0.xy;
+    vec2 coord = TEX0.xy;
 
-//    coordA.x += 0.5 / TextureSize.x; //half-pixel offset
+    coord.y = coord.y * TextureSize.y; 
+    coord.y = floor(coord.y);
+    coord.y += 0.5; //half-pixel offset
+    coord.y = coord.y / TextureSize.y; 
 
-    coordA.y = coordA.y * TextureSize.y; 
-    coordA.y = floor(coordA.y);
-    coordA.y += 0.5; //half-pixel offset
-    coordA.y = coordA.y / TextureSize.y; 
-
-    vec4 sA = COMPAT_TEXTURE(Texture, coordA.xy);
-
-    vec4 final = sA;
-
-//    final.b = InputSize.x == 256.0 ? 1.0 : final.b;
-//    final.r = InputSize.x != 256.0 ? 1.0 : final.r;
+    vec4 final = COMPAT_TEXTURE(Texture, coord.xy);
 
     _OUT._color = final;
     FragColor = _OUT._color;
