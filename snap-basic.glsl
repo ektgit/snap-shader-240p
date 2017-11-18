@@ -52,7 +52,6 @@ void main()
 
     //Center the image vertically:
     float offset = ( logicalScreenHeight - InputSize.y ) * 0.5; 
-    offset -= 8.0; //this is not necessary
     offset /= TextureSize.y; //pixels to [0..1] coordinates
 
     _oPosition1 = gl_Position;

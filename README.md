@@ -9,11 +9,12 @@ How it works:
 * Aligns lines so that only horizontal linear filtering happens.
 
 Make sure you:
+* Copy one or both shaders in the Shader folder of your Raspberry Pi.
 * Until Lakka/RetroPie supports 240p out of the box, you will have to install popcornmix's 240p patch for Raspberry Pi.
 * In the Settings/Driver menu, set the video driver to "gl".
 * Turn off "Bilinear Filtering" in the Settings/Video menu.
 * In the Shader menu, set the shader to use the basic or deluxe version of this shader.
-* Set filter to "linear" in the Shader menu.
+* Set filter to "Linear" in the Quick Menu/Shader menu.
 * Make sure in Video settings, set the resolution to 640x480.  PAL resolutions may work as well.
 
 Deluxe version:
