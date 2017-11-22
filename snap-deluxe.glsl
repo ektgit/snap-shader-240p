@@ -68,6 +68,10 @@ void main()
 
     COL0 = COLOR;
     TEX0.xy = TexCoord.xy;
+
+    //TEX0.z seems to be unused, so use that to pass isVertical to the
+    //pixel shader:
+    TEX0.z = isVertical ? 1.0 : 0.0;
 }
 
 #elif defined(FRAGMENT)
@@ -106,8 +110,6 @@ uniform sampler2D Texture;
 COMPAT_VARYING vec4 TEX0;
 //standard texture sample looks like this: COMPAT_TEXTURE(Texture, TEX0.xy);
 
-vec2 mocap;
-
 void main()
 {
     output_dummy _OUT;
@@ -116,10 +118,13 @@ void main()
 
     coord.y = coord.y * TextureSize.y; 
     coord.y = floor(coord.y);
-    coord.y += 0.5; //half-pixel offset
+    coord.y += 0.5; // sample the pixel dead center
     coord.y = coord.y / TextureSize.y; 
 
-    vec4 final = COMPAT_TEXTURE(Texture, coord.xy);
+    // If we must shrink the image (for vertical games), regular
+    // bilinear filtering looks better:
+    bool isVertical = TEX0.z != 0.0;
+    vec4 final = COMPAT_TEXTURE(Texture, isVertical ? TEX0.xy : coord.xy);
 
     _OUT._color = final;
     FragColor = _OUT._color;

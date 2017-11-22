@@ -96,8 +96,6 @@ uniform sampler2D Texture;
 COMPAT_VARYING vec4 TEX0;
 //standard texture sample looks like this: COMPAT_TEXTURE(Texture, TEX0.xy);
 
-vec2 mocap;
-
 void main()
 {
     output_dummy _OUT;
