@@ -43,16 +43,12 @@ void main()
 
     bool is480i = InputSize.x >= 512.0 && InputSize.y >= 448.0;
 
-    //Until the video driver supports switching between 240p and 480i,
+    //Until we can automatically switch between 240p and 480i, 
     //assume video is in 240p mode, and make provisions for 480i games:
     logicalScreenHeight *= is480i ? 1.0 : 0.5;
 
     //Prevent, for example, 224 games from stretching to 240:
     gl_Position.y *= InputSize.y / logicalScreenHeight;
-
-    //Center the image vertically:
-    float offset = ( logicalScreenHeight - InputSize.y ) * 0.5; 
-    offset /= TextureSize.y; //pixels to [0..1] coordinates
 
     _oPosition1 = gl_Position;
 

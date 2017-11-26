@@ -46,23 +46,27 @@ void main()
     bool is480i = InputSize.x >= 512.0 && InputSize.y >= 448.0;
     bool isVertical = MVPMatrix[0].y != 0.0; //detect rotation in matrix
 
-    //Until the video driver supports switching between 240p and 480i,
+    //Until we can automatically switch between 240p and 480i, 
     //assume video is in 240p mode, and make provisions for 480i games:
     logicalScreenHeight *= is480i ? 1.0 : 0.5;
 
     //Prevent, for example, 224 games from stretching to 240:
     gl_Position.y *= InputSize.y / logicalScreenHeight;
 
+    float scaleToSafeZone = 448.0 / 480.0; 
+    float scaleToOutputWidth = InputSize.y * 2.0 / OutputSize.x;
+    float scaleToOutputHeight = InputSize.y / logicalScreenHeight;
+
+    //In vertical mode, fit it into safe zone:
+    gl_Position.y *= isVertical ? scaleToSafeZone : 1.0;
+    float rotatedInputHeight = isVertical ? InputSize.x : InputSize.y;
+
     gl_Position.x *= isVertical ?
-	( ( InputSize.y * 2.0 ) / OutputSize.x ) * InputSize.y / logicalScreenHeight :
+        scaleToOutputWidth * scaleToOutputHeight * scaleToSafeZone :
 	1.0;
 
-    //Center the image vertically:
-    float offset = ( logicalScreenHeight - InputSize.y ) * 0.5; 
-    offset /= TextureSize.y; //pixels to [0..1] coordinates
-
     //For dual-screen games like Punch-Out!!, just use the bottom screen:
-    gl_Position.y += twoScreens ? 1.0 : offset; 
+    gl_Position.y += twoScreens ? 1.0 : 0.0; 
 
     _oPosition1 = gl_Position;
 
