@@ -39,13 +39,13 @@ void main()
     gl_Position = VertexCoord.x * MVPMatrix[0] + VertexCoord.y * MVPMatrix[1] + VertexCoord.z * MVPMatrix[2] + VertexCoord.w * MVPMatrix[3];
     _oColor = COLOR;
 
-    float logicalScreenHeight = OutputSize.y; //usually 224 or 240
+    float logicalScreenHeight = OutputSize.y; //Usually 480
 
-    bool is480i = InputSize.x >= 512.0 && InputSize.y >= 448.0;
-
-    //Until we can automatically switch between 240p and 480i, 
-    //assume video is in 240p mode, and make provisions for 480i games:
-    logicalScreenHeight *= is480i ? 1.0 : 0.5;
+    float integerRatio = OutputSize.y / InputSize.y;
+    integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
+	
+    //Set the logical screen size (for example, on NTSC, 240 for low res games, 480 for high res games):
+    logicalScreenHeight /= integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
 
     //Prevent, for example, 224 games from stretching to 240:
     gl_Position.y *= InputSize.y / logicalScreenHeight;
