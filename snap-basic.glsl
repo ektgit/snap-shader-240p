@@ -43,8 +43,9 @@ void main()
 
     float integerRatio = OutputSize.y / InputSize.y;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
+    integerRatio = max( 1.0, integerRatio ); //Special case for games taller than the video height
 	
-    //Set the logical screen size (for example, on NTSC, 240 for low res games, 480 for high res games):
+    //Set the logical screen size (for example, on NTSC, 240 for low-res games, 480 for high-res games):
     logicalScreenHeight /= integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
 
     //Prevent, for example, 224 games from stretching to 240:

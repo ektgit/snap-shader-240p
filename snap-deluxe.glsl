@@ -42,7 +42,7 @@ void main()
     const float scaleToSafeZone = 436.0 / 480.0;
 
     //Special cases:
-    bool twoScreens = InputSize.x == 256.0 && InputSize.y == 448.0;
+    bool isTwoScreens = InputSize.x == 256.0 && InputSize.y == 448.0;
     bool isVertical = MVPMatrix[0].y != 0.0; //detect rotation in matrix
 
     vec2 rotatedInputSize = isVertical ? InputSize.yx : InputSize.xy;
@@ -51,16 +51,16 @@ void main()
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
     integerRatio = max( 1.0, integerRatio ); //Some high-resolution vertical games are taller than 480 pixels.
     
-    //Set the logical screen size (for example, on NTSC, 240 for low res games, 480 for high res games):
+    //Set the logical screen size (for example, on NTSC, 240 for low-res games, 480 for high-res games):
     vec2 logicalOutputSize = OutputSize.xy; //usually 224 or 240
     logicalOutputSize /= integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
     
-    logicalOutputSize.y *= twoScreens ? 0.5 : 1.0; //For dual-screen games, pretend we have double the screen height.
+    logicalOutputSize.y *= isTwoScreens ? 0.5 : 1.0; //For dual-screen games, pretend we have double the screen height.
 
     //Prevent, for example, 224 games from stretching to 240:
     gl_Position.y *= isVertical ? 1.0 : rotatedInputSize.y / logicalOutputSize.y;
 
-    vec2 scaleToOutput = rotatedInputSize.xy / logicalOutputSize.xy;
+    vec2 scaleToOutput = rotatedInputSize / logicalOutputSize;
 
     //In vertical mode, fill vertically, fit into safe zone:
     gl_Position.xy *= isVertical ? scaleToOutput : vec2( 1.0, 1.0 );
@@ -68,7 +68,7 @@ void main()
     gl_Position.xy *= isVertical ? scaleToSafeZone : 1.0;
 
     //For dual-screen games like Punch-Out!!, just use the bottom screen:
-    gl_Position.y += twoScreens ? 1.0 : 0.0; 
+    gl_Position.y += isTwoScreens ? 1.0 : 0.0;
 
     _oPosition1 = gl_Position;
 
