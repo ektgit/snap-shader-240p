@@ -64,7 +64,7 @@ void main()
 
     //In vertical mode, fill vertically, fit into safe zone:
     gl_Position.xy *= isVertical ? scaleToOutput : vec2( 1.0, 1.0 );
-    gl_Position.xy *= isVertical ? OutputSize.y / rotatedInputSize.y : 1.0;
+    gl_Position.xy *= isVertical ? logicalOutputSize.y / rotatedInputSize.y : 1.0;
     gl_Position.xy *= isVertical ? scaleToSafeZone : 1.0;
 
     //For dual-screen games like Punch-Out!!, just use the bottom screen:
