@@ -43,7 +43,7 @@ void main()
 
     //Special cases:
     bool isTwoScreens = InputSize.x == 256.0 && InputSize.y == 448.0;
-    bool isVertical = MVPMatrix[0].y != 0.0; //detect rotation in matrix
+    bool isVertical = MVPMatrix[0].y != 0.0; //detect rotated games
 
     vec2 rotatedInputSize = isVertical ? InputSize.yx : InputSize.xy;
 
@@ -52,13 +52,18 @@ void main()
     integerRatio = max( 1.0, integerRatio ); //Some high-resolution vertical games are taller than 480 pixels.
     
     //Set the logical screen size (for example, on NTSC, 240 for low-res games, 480 for high-res games):
-    vec2 logicalOutputSize = OutputSize.xy; //usually 224 or 240
-    logicalOutputSize /= integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
+    vec2 logicalOutputSize = OutputSize.xy / integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
     
-    logicalOutputSize.y *= isTwoScreens ? 0.5 : 1.0; //For dual-screen games, pretend we have double the screen height.
+    //For two screen games like Punch-Out!!, just use the bottom screen.
+    //(Pretend we have double the screen height, center scaling around middle of bottom screen, then restore).
+    logicalOutputSize.y *= isTwoScreens ? 0.5 : 1.0;
+
+    gl_Position.y += isTwoScreens ? 1.0 : 0.0;
 
     //Prevent, for example, 224 games from stretching to 240:
     gl_Position.y *= isVertical ? 1.0 : rotatedInputSize.y / logicalOutputSize.y;
+    
+    gl_Position.y -= isTwoScreens ? 1.0 : 0.0;
 
     vec2 scaleToOutput = rotatedInputSize / logicalOutputSize;
 
@@ -66,9 +71,6 @@ void main()
     gl_Position.xy *= isVertical ? scaleToOutput : vec2( 1.0, 1.0 );
     gl_Position.xy *= isVertical ? logicalOutputSize.y / rotatedInputSize.y : 1.0;
     gl_Position.xy *= isVertical ? scaleToSafeZone : 1.0;
-
-    //For dual-screen games like Punch-Out!!, just use the bottom screen:
-    gl_Position.y += isTwoScreens ? 1.0 : 0.0;
 
     _oPosition1 = gl_Position;
 
@@ -122,10 +124,11 @@ void main()
 
     vec2 coord = TEX0.xy;
 
+    // Make sure we sample the pixel center so that we don't pick up neighbor pixels:
     coord.y = coord.y * TextureSize.y; 
     coord.y = floor(coord.y);
     coord.y += 0.5; // sample the pixel dead center
-    coord.y = coord.y / TextureSize.y; 
+    coord.y = coord.y / TextureSize.y;
 
     // If we must shrink the image (for vertical games), regular
     // bilinear filtering looks better:

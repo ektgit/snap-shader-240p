@@ -38,18 +38,16 @@ void main()
     vec2 _otexCoord;
     gl_Position = VertexCoord.x * MVPMatrix[0] + VertexCoord.y * MVPMatrix[1] + VertexCoord.z * MVPMatrix[2] + VertexCoord.w * MVPMatrix[3];
     _oColor = COLOR;
-
-    float logicalScreenHeight = OutputSize.y; //Usually 480
-
+    
     float integerRatio = OutputSize.y / InputSize.y;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
     integerRatio = max( 1.0, integerRatio ); //Special case for games taller than the video height
-	
+    
     //Set the logical screen size (for example, on NTSC, 240 for low-res games, 480 for high-res games):
-    logicalScreenHeight /= integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
+    float logicalOutputHeight = OutputSize.y / integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
 
     //Prevent, for example, 224 games from stretching to 240:
-    gl_Position.y *= InputSize.y / logicalScreenHeight;
+    gl_Position.y *= InputSize.y / logicalOutputHeight;
 
     _oPosition1 = gl_Position;
 
@@ -98,11 +96,12 @@ void main()
     output_dummy _OUT;
 
     vec2 coord = TEX0.xy;
-
+    
+    // Make sure we sample the pixel center so that we don't pick up neighbor pixels:
     coord.y = coord.y * TextureSize.y; 
     coord.y = floor(coord.y);
     coord.y += 0.5; //half-pixel offset
-    coord.y = coord.y / TextureSize.y; 
+    coord.y = coord.y / TextureSize.y;
 
     vec4 final = COMPAT_TEXTURE(Texture, coord.xy);
 

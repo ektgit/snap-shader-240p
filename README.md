@@ -1,6 +1,6 @@
 # snap-shader-240p
 
-For Raspberry Pi with built-in composite out to a CRT TV.  (This may work with the RetroTINK as well, offering the same benefits).
+For Raspberry Pi with built-in composite out to a CRT TV.  (This may work with the RetroTINK as well, offering the same benefit of not having to tune every game system).
 
 Ensures games on CRT will look as good as on original hardware.  Makes games crisp vertically, and not shimmer horizontally.
 
@@ -12,10 +12,10 @@ How it works:
 
 Make sure you:
 * Copy one or both shaders to the Shader folder of your Raspberry Pi.
-* I recommend Lakka 2.1 or newer.  Earlier versions require popcornmix's patch.
-* In /flash/config.txt, set sdtv_mode=16, or 18 for PAL.
+* I recommend Lakka 2.1 or newer.
+* In /flash/config.txt, set sdtv_mode=16, or 18 for PAL.  This ensures 240p with "scanlines", just like on original hardware.
 * In Video settings, set "Aspect Ratio" to "Custom".
-* Set the Custom Aspect Ratio to 640x480.  PAL resolutions may work as well.
+* Set the Custom Aspect Ratio to 640x480, or the PAL* equivalent.
 * Make sure "Bilinear Filtering" is off in the Settings/Video menu.
 * In the Settings/Driver menu, make sure "Video Driver" is "gl".
 * In the Quick Menu/Shaders menu, set the shader to the basic or deluxe version of this shader.
@@ -26,6 +26,8 @@ Will fit vertical games correctly on horizontal TVs.
 It will also make two-screen games more playable by only showing the bottom screen.
 
 Tested only on a Raspberry Pi 3 on NTSC but should work on PAL as well.
+
+*Please report any problems with PAL.  It's possible Sega Master System games will appear too tall on PAL TVs unless you shrink the video height to less than 576 lines.  It's because 192 fits into 576 three times rather than two.
 
 Please feel free to submit any improvements.
 
