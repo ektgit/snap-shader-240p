@@ -39,7 +39,13 @@ void main()
     gl_Position = VertexCoord.x * MVPMatrix[0] + VertexCoord.y * MVPMatrix[1] + VertexCoord.z * MVPMatrix[2] + VertexCoord.w * MVPMatrix[3];
     _oColor = COLOR;
     
-    float integerRatio = OutputSize.y / InputSize.y;
+    float numLines = InputSize.y;
+    numLines = InputSize.y <= 480.0 ? 480.0 : numLines; //480i games
+    numLines = InputSize.y <= 450.0 ? 384.0 : numLines; //VGA20 and medium-resolution games
+    numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
+    numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resoultion games
+    
+    float integerRatio = OutputSize.y / numLines;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
     integerRatio = max( 1.0, integerRatio ); //Special case for games taller than the video height
     
