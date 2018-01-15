@@ -1,4 +1,4 @@
-//Copyright 2017 E. Kenji Takeuchi
+//Copyright 2017-2018 E. Kenji Takeuchi
 
 #if defined(VERTEX)
 
@@ -45,16 +45,23 @@ void main()
     bool isTwoScreens = InputSize.x == 256.0 && InputSize.y == 448.0;
     bool isVertical = MVPMatrix[0].y != 0.0; //detect rotated games
 
+    float numLines = InputSize.y;
+    numLines = InputSize.y <= 480.0 ? 480.0 : numLines; //480i games
+    numLines = InputSize.y <= 450.0 ? 384.0 : numLines; //VGA20 and medium-resolution games
+    numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
+    numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resolution games
+
     vec2 rotatedInputSize = isVertical ? InputSize.yx : InputSize.xy;
 
-    float integerRatio = OutputSize.y / rotatedInputSize.y;
+    float integerRatio = OutputSize.y / numLines;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
     integerRatio = max( 1.0, integerRatio ); //Some high-resolution vertical games are taller than 480 pixels.
+    
     
     //Set the logical screen size (for example, on NTSC, 240 for low-res games, 480 for high-res games):
     vec2 logicalOutputSize = OutputSize.xy / integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
     
-    //For two screen games like Punch-Out!!, just use the bottom screen.
+    //For two-screen games like Punch-Out!!, just use the bottom screen.
     //(Pretend we have double the screen height, center scaling around middle of bottom screen, then restore).
     logicalOutputSize.y *= isTwoScreens ? 0.5 : 1.0;
 

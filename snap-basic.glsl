@@ -1,4 +1,4 @@
-//Copyright 2017 E. Kenji Takeuchi
+//Copyright 2017-2018 E. Kenji Takeuchi
 
 #if defined(VERTEX)
 
@@ -43,7 +43,7 @@ void main()
     numLines = InputSize.y <= 480.0 ? 480.0 : numLines; //480i games
     numLines = InputSize.y <= 450.0 ? 384.0 : numLines; //VGA20 and medium-resolution games
     numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
-    numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resoultion games
+    numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resolution games
     
     float integerRatio = OutputSize.y / numLines;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
