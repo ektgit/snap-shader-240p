@@ -46,8 +46,8 @@ void main()
     bool isVertical = MVPMatrix[0].y != 0.0; //detect rotated games
 
     float numLines = InputSize.y;
-    numLines = InputSize.y <= 480.0 ? 480.0 : numLines; //480i games
-    numLines = InputSize.y <= 450.0 ? 384.0 : numLines; //VGA20 and medium-resolution games
+    numLines = InputSize.y <= 525.0 ? 480.0 : numLines; //480i games
+    numLines = InputSize.y <= 416.0 ? 384.0 : numLines; //Medium-resolution games
     numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
     numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resolution games
 
@@ -68,7 +68,7 @@ void main()
     gl_Position.y += isTwoScreens ? 1.0 : 0.0;
 
     //Prevent, for example, 224 games from stretching to 240:
-    gl_Position.y *= isVertical ? 1.0 : rotatedInputSize.y / logicalOutputSize.y;
+    gl_Position.y *= isVertical ? 1.0 : rotatedInputSize.y / numLines;
     
     gl_Position.y -= isTwoScreens ? 1.0 : 0.0;
 
@@ -139,8 +139,8 @@ void main()
 
     // If we must shrink the image (for vertical games), regular
     // bilinear filtering looks better:
-    bool isVertical = TEX0.z != 0.0;
-    vec4 final = COMPAT_TEXTURE(Texture, isVertical ? TEX0.xy : coord.xy);
+    bool useFilter = TEX0.z != 0.0;
+    vec4 final = COMPAT_TEXTURE(Texture, useFilter ? TEX0.xy : coord.xy);
 
     _OUT._color = final;
     FragColor = _OUT._color;

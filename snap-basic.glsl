@@ -40,8 +40,8 @@ void main()
     _oColor = COLOR;
     
     float numLines = InputSize.y;
-    numLines = InputSize.y <= 480.0 ? 480.0 : numLines; //480i games
-    numLines = InputSize.y <= 450.0 ? 384.0 : numLines; //VGA20 and medium-resolution games
+    numLines = InputSize.y <= 525.0 ? 480.0 : numLines; //480i games
+    numLines = InputSize.y <= 416.0 ? 384.0 : numLines; //Medium-resolution games
     numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
     numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resolution games
     
@@ -53,12 +53,16 @@ void main()
     float logicalOutputHeight = OutputSize.y / integerRatio; //e.g. 240 = 480 / 2, or 480 = 480 / 1 for 480i games
 
     //Prevent, for example, 224 games from stretching to 240:
-    gl_Position.y *= InputSize.y / logicalOutputHeight;
+    gl_Position.y *= InputSize.y / numLines;
 
     _oPosition1 = gl_Position;
 
     COL0 = COLOR;
     TEX0.xy = TexCoord.xy;
+	
+    //TEX0.z seems to be unused, so use that to pass isVertical to the
+    //pixel shader:
+    TEX0.z = numLines > logicalOutputHeight ? 1.0 : 0.0;
 }
 
 #elif defined(FRAGMENT)
@@ -102,14 +106,17 @@ void main()
     output_dummy _OUT;
 
     vec2 coord = TEX0.xy;
-    
+
     // Make sure we sample the pixel center so that we don't pick up neighbor pixels:
     coord.y = coord.y * TextureSize.y; 
     coord.y = floor(coord.y);
-    coord.y += 0.5; //half-pixel offset
+    coord.y += 0.5; // sample the pixel dead center
     coord.y = coord.y / TextureSize.y;
 
-    vec4 final = COMPAT_TEXTURE(Texture, coord.xy);
+    // If we must shrink the image (for vertical games), regular
+    // bilinear filtering looks better:
+    bool useFilter = TEX0.z != 0.0;
+    vec4 final = COMPAT_TEXTURE(Texture, useFilter ? TEX0.xy : coord.xy);
 
     _OUT._color = final;
     FragColor = _OUT._color;
