@@ -42,18 +42,22 @@ void main()
     const float scaleToSafeZone = 436.0 / 480.0;
 
     //Special cases:
-    bool isTwoScreens = InputSize.x == 256.0 && InputSize.y == 448.0;
+    bool isTwoScreens = InputSize.x == 256.0 && InputSize.y == 448.0; //Nintendo Players' Choice
+    isTwoScreens = isTwoScreens || ( InputSize.x == 320.0 && InputSize.y == 416.0 ); //Sega Mega Tech
+    bool isHandheld = InputSize.x == 160.0 && InputSize.y == 144.0; //Currently only supports Game Boy, Game Boy Color, and Game Gear
     bool isVertical = MVPMatrix[0].y != 0.0; //detect rotated games
 
-    float numLines = InputSize.y;
-    numLines = InputSize.y <= 525.0 ? 480.0 : numLines; //480i games
-    numLines = InputSize.y <= 416.0 ? 384.0 : numLines; //Medium-resolution games
-    numLines = InputSize.y <= 312.0 ? 288.0 : numLines; //Extended-resolution games
-    numLines = InputSize.y <= 262.0 ? 240.0 : numLines; //Standard-resolution games
+    float numInputLines = InputSize.y;
+    numInputLines = InputSize.y <= 525.0 ? 480.0 : numInputLines; //480i games (15.7 and 31.5 KHz)
+    numInputLines = InputSize.y <= 416.0 ? 384.0 : numInputLines; //Medium-resolution games (25 KHz, e.g. Williams)
+    numInputLines = InputSize.y <= 312.0 ? 288.0 : numInputLines; //Extended-resolution games (16.5 KHz at 53 Hz, e.g. Midway)
+    numInputLines = InputSize.y <= 262.0 ? 240.0 : numInputLines; //Standard-resolution games (15.7 Khz
+
+    numInputLines = isTwoScreens ? 240.0 : numInputLines;
 
     vec2 rotatedInputSize = isVertical ? InputSize.yx : InputSize.xy;
 
-    float integerRatio = OutputSize.y / numLines;
+    float integerRatio = OutputSize.y / numInputLines;
     integerRatio = floor( integerRatio ); //e.g. 2 = floor( 480 / 224 )
     integerRatio = max( 1.0, integerRatio ); //Some high-resolution vertical games are taller than 480 pixels.
     
@@ -68,7 +72,11 @@ void main()
     gl_Position.y += isTwoScreens ? 1.0 : 0.0;
 
     //Prevent, for example, 224 games from stretching to 240:
-    gl_Position.y *= isVertical ? 1.0 : rotatedInputSize.y / numLines;
+    vec2 transform;
+    transform.x = isHandheld ? integerRatio * rotatedInputSize.x / OutputSize.x : 1.0;
+    transform.y = isVertical ? 1.0 : rotatedInputSize.y / numInputLines;
+
+    gl_Position.xy *= transform;
     
     gl_Position.y -= isTwoScreens ? 1.0 : 0.0;
 
@@ -86,7 +94,7 @@ void main()
 
     //TEX0.z seems to be unused, so use that to pass isVertical to the
     //pixel shader:
-    TEX0.z = isVertical ? 1.0 : 0.0;
+    TEX0.z = isVertical || ( rotatedInputSize.y * integerRatio > OutputSize.y ) ? 1.0 : 0.0;
 }
 
 #elif defined(FRAGMENT)
